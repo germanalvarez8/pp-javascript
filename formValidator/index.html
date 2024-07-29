@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validación de formulario</title>
+</head>
+
+<body>
+    <div class="container">
+        <h2>BIENVENIDO</h2>
+        <form onsubmit="checkPassword()">
+            <input id="username" type="text" placeholder="Nombre de Usuario">
+            <input id="pass" type="password" placeholder="Contraseña">
+            <button type="submit" className="boton">Iniciar Sesión</button>
+        </form>
+    </div>
+</body>
+</html>
+
+<script type="text/javascript">
+    function checkPassword() {
+        event.preventDefault()
+        let username = document.getElementById('username').value
+        let pass = document.getElementById('pass').value
+        console.log('hola', username, pass);
+
+        if (username === '' || pass === '') {
+            window.alert("Debe colocar usuario y contraseña");
+            return;
+        }
+
+        if (username === 'alumnoitec' && pass === 'itec123') {
+            window.alert("Credenciales correctas");
+        } else if (username === 'easter' && pass === 'egg') {
+            window.alert("Easter Egg found :D");
+        } else {
+            window.alert("Credenciales incorrectas, intente nuevamente");
+        }
+    }
+</script>

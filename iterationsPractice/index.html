@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio iteraciones</title>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Armador de listas</h2>
+        <button onclick="startListFactory()">Iniciar solicitud</button>
+        <div id="name_list"></div>
+    </div>
+
+    <div class="container">
+        <h2>Filtro de pares</h2>
+        <button onclick="startPairFilter()">Iniciar filtrado</button>
+        <div id="pair_list"></div>
+    </div>
+</body>
+</html>
+
+<script type="text/javascript">
+    // Ejercicios combinados:
+    // 1) Escribe un programa que solicite al usuario ingresar nombres y los agregue a un array utilizando el método push. El programa debe continuar solicitando nombres hasta que el usuario ingrese "fin"
+    // 2) Escribe un programa que solicite al usuario ingresar un rango de números y los guarde en un array. Luego, recorrer ese array y devuelve solo los números pares.
+
+    function startListFactory() {
+        let list = [];
+        let name = requestInput('Ingresa un nombre');
+        let nameList = document.getElementById('name_list');
+        while (name !== 'fin') {
+            list.push(name)
+            name = requestInput('Ingresa un nombre');
+        }
+
+        nameList.textContent = `Nombres cargados: ${list.toString()}`
+    }
+
+    function startPairFilter() {
+        let listRange = requestInput('Ingrese rango de numeros separado con - (Ejemplo 1-8)');
+        let range = listRange.split('-')
+        let pairList = [];
+        let pairListHtml = document.getElementById('pair_list');
+
+        for (let index = parseInt(range[0]); index <= parseInt(range[1]); index++) {
+            if (index % 2 == 0) {
+                pairList.push(index)
+            }
+        }
+
+        pairListHtml.textContent = `Los numeros pares entre ${range[0]} y ${range[1]} es: ${pairList.toString()}`
+    }
+
+    function requestInput(message) {
+        return prompt(message)
+    }
+</script>

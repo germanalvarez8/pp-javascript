@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Notas</title>
+    <style>
+        body {
+            background-color: #EDF2FB;
+        }
+
+        .student-forms {
+            display: flex;
+        }
+
+        .title {
+            display: flex;
+            background-color: #C1D3FE;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #formulario-notas {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: column;
+            margin-left: 10%;
+            margin-top: 3%;
+        }
+
+        #formulario-alumno {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: column;
+            margin-left: 10%;
+            margin-top: 3%;
+        }
+
+        .students_table_section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction:row;
+            margin-top: 5%;
+        }
+
+        .students_table {
+            width: 60%;
+        }
+
+        .results-table {
+            width: 30%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        /* form {
+            margin-top: 20px;
+        } */
+    </style>
+</head>
+<body>
+    <div class="title">
+        <h1>Registro de Notas</h1>
+    </div>
+    <div class="student-forms">
+        <form id="formulario-notas" onsubmit="updateNote(this)">
+            <label for="nombre">Nombre del estudiante:</label>
+            <select id="nombre" name="nombre"></select>
+            <label for="nota">Nota:</label>
+            <input type="number" id="nota" name="nota" min="0" max="10" required>
+            <button type="submit">Actualizar Nota</button>
+        </form>
+
+        <form id="formulario-alumno" onsubmit="addStudent(this)">
+            <label for="nombre_nuevo">Agregar estudiante:</label>
+            <input type="text" id="nombre_nuevo" required>
+            <label for="nota_nuevo">Nota:</label>
+            <input type="number" id="nota_nuevo" name="nota" min="0" max="10" required>
+            <button type="submit">Agregar usuario</button>
+        </form>
+    </div>
+
+    <div class="students_table_section">
+        <table class="students_table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Nota</th>
+                </tr>
+            </thead>
+            <tbody id="notes-table"></tbody>
+        </table>
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>
+                        Accion
+                    </th>
+                    <th>
+                        Resultado
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="notes-table">
+                <tr>
+                    <td>
+                        <button onclick="updateAverage()">Actualizar promedios</button>
+                    </td>
+                    <td>
+                        <p id="general-average"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="getHigherNote()">Calificacion mas alta</button>
+                    </td>
+                    <td>
+                        <p id="higher-note"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="getLowerNote()">Calificacion mas baja</button>
+                    </td>
+                    <td>
+                        <p id="lower-note"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="getApproved()">Alumnos aprobados</button>
+                    </td>
+                    <td>
+                        <p id="approved-students"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="getReproved()">Alumnos desaprobados</button>
+                    </td>
+                    <td>
+                        <p id="reproved-students"></p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <script>
+        let students = [
+            {name: 'Homero simpson', note: 4},
+            {name: 'Mike Tyson', note: 9},
+            {name: 'Harry Potter', note: 7},
+            {name: 'Max Verstappen', note: 1},
+            {name: 'Leonardo Jara', note: 9},
+            {name: 'Emanuel Mammana', note: 2}
+        ];
+
+        function loadStudents() {
+            let storageStudents = getStudentList();
+            var select = document.getElementById('nombre');
+            storageStudents.forEach(function(student) {
+                var option = document.createElement('option');
+                option.textContent = student.name;
+                select.appendChild(option);
+            });
+        }
+
+        function loadNotes() {
+            let storageStudents = getStudentList();
+            var tabla = document.getElementById('notes-table');
+            tabla.innerHTML = '';
+            storageStudents.forEach(function(student) {
+                var row = tabla.insertRow();
+                var cellNombre = row.insertCell(0);
+                var cellNotas = row.insertCell(1);
+
+                cellNombre.textContent = student.name;
+                cellNotas.textContent = student.note;
+            });
+        }
+
+        loadStudents();
+        loadNotes();
+
+        function addStudent(form) {
+            var name = form.nombre_nuevo.value.trim();
+            var note = parseInt(form.nota_nuevo.value);
+
+            let students = JSON.parse(localStorage.getItem('students')) || [];
+            students.push({ name: name, note: note });
+
+            localStorage.setItem('students', JSON.stringify(students));
+
+            form.reset();
+
+            return false;
+        }
+
+        function updateNote(element) {
+            event.preventDefault();
+            let storageStudents = getStudentList();
+            var name = element.nombre.value.trim();
+            var note = parseInt(element.nota.value);
+            var studentIndex = storageStudents.findIndex(student => student.name === name);
+
+            if (studentIndex !== -1) {
+                storageStudents[studentIndex].note = note;
+                localStorage.setItem('students', JSON.stringify(storageStudents));
+
+                element.reset();
+                loadNotes();
+            } else {
+                console.log('Estudiante no encontrado.');
+            }
+        }
+
+        function updateAverage() {
+            let storageStudents = getStudentList();
+            let averageElement = document.getElementById('general-average');
+            let total = 0;
+            let average = 0;
+
+            storageStudents.forEach(function(student, index) {
+                total += student.note
+            });
+
+            average = total / storageStudents.length
+            averageElement.textContent = `Promedio general: ${average.toFixed(2)}`
+        }
+
+        function getHigherNote() {
+            let storageStudents = getStudentList();
+            let higherNoteElement = document.getElementById('higher-note');
+            let higherNote = 0;
+            let higherNoteUser = '';
+
+            storageStudents.forEach(function(student) {
+                if (student.note > higherNote) {
+                    higherNote = student.note
+                    higherNoteUser = student.name
+                }
+            });
+
+            higherNoteElement.textContent = `Nota mas alta: ${higherNote} del alumno ${higherNoteUser}`
+        }
+
+        function getLowerNote() {
+            let storageStudents = getStudentList();
+            let lowerNoteElement = document.getElementById('lower-note');
+            let lowerNote = 10;
+            let lowerNoteUser = '';
+
+            storageStudents.forEach(function(student) {
+                if (student.note < lowerNote) {
+                    lowerNote = student.note
+                    lowerNoteUser = student.name
+                }
+            });
+
+            lowerNoteElement.textContent = `Nota mas baja: ${lowerNote} del alumno ${lowerNoteUser}`
+        }
+
+        function getApproved() {
+            let storageStudents = getStudentList();
+            let approvedStudentsElement = document.getElementById('approved-students');
+            let approvedStudent = [];
+
+            storageStudents.forEach(function(student) {
+                if (student.note >= 5) {
+                    approvedStudent.push(student.name)
+                }
+            });
+
+            approvedStudentsElement.textContent = `Alumnos aprobados: ${approvedStudent}`
+        }
+
+        function getReproved() {
+            let storageStudents = getStudentList();
+            let reprovedStudentsElement = document.getElementById('reproved-students');
+            let reprovedStudents = [];
+
+            storageStudents.forEach(function(student) {
+                if (student.note < 5) {
+                    reprovedStudents.push(student.name)
+                }
+            });
+
+            reprovedStudentsElement.textContent = `Alumnos reprobados: ${reprovedStudents}`
+        }
+
+        function getStudentList() {
+            return JSON.parse(localStorage.getItem('students')) || [];
+        }
+    </script>
+</body>
+</html>
